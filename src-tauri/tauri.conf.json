@@ -29,7 +29,8 @@
       "active": true,
       "windows": {
         "installMode": "passive"
-      }
+      },
+      "pubkey": "MCowBQYDK2VwAyEAmIaWPGZOvM03Py1g1jpLt/btmtc26GUUrpd8+srLwcM="
     }
   },
   "bundle": {
