@@ -179,6 +179,7 @@ jobs:
         if: matrix.config.os == 'macos-latest' && matrix.config.arch == 'aarch64'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }} # Access the secret
         with:
           releaseId: ${{ needs.create-release.outputs.release_id }}
           releaseBody: ${{ needs.create-release.outputs.release_body }}
