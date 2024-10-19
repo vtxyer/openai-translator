@@ -7,6 +7,11 @@ use similar::utils::diff_chars;
 use similar::{Algorithm, ChangeTag};
 use std::{thread, time::Duration};
 use tauri_plugin_aptabase::EventTracker;
+use reqwest::Client;
+use serde_json::json;
+use crate::config;
+use reqwest::multipart;
+use base64;
 
 pub fn get_input_text(
     enigo: &mut Enigo,
@@ -429,4 +434,47 @@ pub fn finish_writing() {
         let mut previous_translated_text = PREVIOUS_TRANSLATED_TEXT.lock();
         *previous_translated_text = input_text;
     }
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn toggle_dictation() -> Result<(), String> {
+    // This function will be called when the dictation hotkey is pressed
+    // You can implement any necessary logic here
+    Ok(())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn transcribe_audio(base64_audio: String) -> Result<serde_json::Value, String> {
+    let client = Client::new();
+    
+    // 从配置中获取 GROQ_API_KEY
+    let config = config::get_config().map_err(|e| e.to_string())?;
+    let api_key = "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";
+    
+    let decoded_audio = base64::decode(base64_audio).map_err(|e| e.to_string())?;
+    
+    let part = multipart::Part::bytes(decoded_audio)
+        .file_name("audio.wav")
+        .mime_str("audio/wav")
+        .map_err(|e| e.to_string())?;
+
+    let form = multipart::Form::new()
+        .text("model", "whisper-large-v3-turbo")
+        .text("prompt", "Specify context or spelling")
+        .text("temperature", "0")
+        .text("response_format", "json")
+        .part("file", part);
+
+    let response = client
+        .post("https://api.groq.com/openai/v1/audio/translations")
+        .header("Authorization", format!("Bearer {}", api_key))
+        .multipart(form)
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    let json_response = response.json::<serde_json::Value>().await.map_err(|e| e.to_string())?;
+    Ok(json_response)
 }

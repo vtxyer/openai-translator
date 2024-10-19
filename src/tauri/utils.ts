@@ -120,10 +120,34 @@ export async function bindWritingHotkey(oldWritingHotKey?: string) {
     })
 }
 
+export async function bindDictationHotkey(oldDictationHotKey?: string) {
+    if (oldDictationHotKey && !isMissingNormalKey(oldDictationHotKey) && (await isRegistered(oldDictationHotKey))) {
+        await unregister(oldDictationHotKey)
+    }
+    const settings = await getSettings()
+    if (!settings.dictationHotkey) return
+    if (isMissingNormalKey(settings.dictationHotkey)) {
+        sendNotification({
+            title: 'Cannot bind hotkey',
+            body: `Hotkey must contain at least one normal key: ${settings.dictationHotkey}`,
+        })
+        return
+    }
+    if (await isRegistered(settings.dictationHotkey)) {
+        await unregister(settings.dictationHotkey)
+    }
+    await register(settings.dictationHotkey, () => {
+        return commands.toggleDictation()
+    }).then(() => {
+        console.log('dictation hotkey registered')
+    })
+}
+
 export function onSettingsSave(oldSettings: ISettings) {
     events.configUpdatedEvent.emit()
     bindHotkey(oldSettings.hotkey)
     bindDisplayWindowHotkey(oldSettings.displayWindowHotkey)
     bindOCRHotkey(oldSettings.ocrHotkey)
     bindWritingHotkey(oldSettings.writingHotkey)
+    bindDictationHotkey(oldSettings.dictationHotkey)
 }

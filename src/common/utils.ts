@@ -112,6 +112,7 @@ const settingKeys: Record<keyof ISettings, number> = {
     uiFontSize: 1,
     iconSize: 1,
     noModelsAPISupport: 1,
+    dictationHotkey: 0, // Add this line
 }
 
 export async function getSettings(): Promise<ISettings> {

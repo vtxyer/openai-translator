@@ -2,7 +2,14 @@ import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { Translator } from '../../common/components/Translator'
 import { Client as Styletron } from 'styletron-engine-atomic'
 import { listen, Event } from '@tauri-apps/api/event'
-import { bindDisplayWindowHotkey, bindHotkey, bindOCRHotkey, bindWritingHotkey, onSettingsSave } from '../utils'
+import {
+    bindDisplayWindowHotkey,
+    bindHotkey,
+    bindOCRHotkey,
+    bindWritingHotkey,
+    onSettingsSave,
+    bindDictationHotkey,
+} from '../utils'
 import { v4 as uuidv4 } from 'uuid'
 import { PREFIX } from '../../common/constants'
 import { translate } from '../../common/translate'
@@ -202,6 +209,7 @@ export function TranslatorWindow() {
         bindDisplayWindowHotkey()
         bindOCRHotkey()
         bindWritingHotkey()
+        bindDictationHotkey()
     }, [])
 
     const [isSettingsOpen, setIsSettingsOpen] = useState(false)

@@ -57,6 +57,17 @@ export const commands = {
     async cutImage(left: number, top: number, width: number, height: number): Promise<void> {
         await TAURI_INVOKE('cut_image', { left, top, width, height })
     },
+    async toggleDictation(): Promise<void> {
+        await TAURI_INVOKE('toggle_dictation')
+    },
+    async transcribeAudio(base64Audio: string): Promise<Result<{ text: string }, string>> {
+        try {
+            return { status: 'ok', data: await TAURI_INVOKE('transcribe_audio', { base64Audio }) }
+        } catch (e) {
+            if (e instanceof Error) throw e
+            else return { status: 'error', error: e as any }
+        }
+    },
 }
 
 export const events = __makeEvents__<{
